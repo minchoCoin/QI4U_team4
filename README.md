@@ -46,3 +46,12 @@ pip install -r requirements.txt
 
 # 5. Start the server
 uvicorn main:app --reload
+
+# 1
+cd frontend 
+
+# 2 
+npm install axios
+
+# 3 
+npm run dev
