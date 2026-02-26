@@ -1,52 +1,60 @@
-import { useState, useEffect } from 'react'
-import './App.css'
+import { useState } from "react"
+import axios from "axios"
 
 function App() {
-  // 1. バックエンドから取得したデータを保持する変数 (State)
-  const [message, setMessage] = useState("")
-  const [numbers, setNumbers] = useState([])
 
-  // 2. 画面が表示された時に一度だけ実行される処理 (useEffect)
-  useEffect(() => {
-    // APIを叩く関数
-    const fetchData = async () => {
-      try {
-        // Helloメッセージの取得
-        const rootResponse = await fetch("http://localhost:8000/")
-        const rootData = await rootResponse.json()
-        setMessage(rootData.message)
+  const [groups, setGroups] = useState({
+    A: 30, B: 200, C: 10,
+    D: 40, E: 60, F: 10,
+    G: 20, H: 30, I: 20
+  })
 
-        // 数値データの取得
-        const dataResponse = await fetch("http://localhost:8000/api/data")
-        const dataJson = await dataResponse.json()
-        setNumbers(dataJson.data)
-        
-      } catch (error) {
-        console.error("データの取得に失敗しました:", error)
-      }
-    }
+  const [result, setResult] = useState(null)
 
-    fetchData()
-  }, []) // [] は「最初の1回だけ実行」という意味
+  const handleChange = (key, value) => {
+    setGroups({...groups, [key]: Number(value)})
+  }
 
-  // 3. 画面の表示 (JSX)
+  const optimize = async () => {
+    const res = await axios.post("http://localhost:8000/optimize", groups)
+    setResult(res.data)
+  }
+
   return (
-    <div style={{ padding: "20px", textAlign: "center" }}>
-      <h1>React + FastAPI連携テスト</h1>
-      
-      <div style={{ margin: "20px", border: "1px solid #ccc", padding: "10px" }}>
-        <h2>バックエンドからのメッセージ:</h2>
-        <p style={{ color: "blue", fontWeight: "bold" }}>{message}</p>
-      </div>
+    <div style={{padding: 40}}>
+      <h1>避難ルート最適化アプリ</h1>
 
-      <div style={{ margin: "20px", border: "1px solid #ccc", padding: "10px" }}>
-        <h2>取得したデータリスト:</h2>
-        <ul>
-          {numbers.map((num, index) => (
-            <li key={index}>データ番号: {num}</li>
+      <h2>人数入力</h2>
+      {Object.keys(groups).map(g => (
+        <div key={g}>
+          {g}:
+          <input
+            type="number"
+            value={groups[g]}
+            onChange={(e)=>handleChange(g, e.target.value)}
+          />
+        </div>
+      ))}
+
+      <button onClick={optimize}>最適化実行</button>
+
+      {result && (
+        <>
+          <h2>ルート結果</h2>
+          {Object.entries(result.routes).map(([g, route]) => (
+            <div key={g}>
+              {g} → {route.join(" → ")}
+            </div>
           ))}
-        </ul>
-      </div>
+
+          <h2>エッジ混雑状況</h2>
+          {Object.entries(result.edge_load).map(([e, load]) => (
+            <div key={e}>
+              {e}: {load}人
+            </div>
+          ))}
+        </>
+      )}
     </div>
   )
 }
