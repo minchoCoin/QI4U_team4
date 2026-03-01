@@ -1,4 +1,7 @@
-Hello, guys!
+Optimization for evacuation route of IT building using Simulated Annealing and Quantum Annealing
+
+For detailed information, please refer the [presentation.pdf](https://github.com/minchoCoin/QI4U_team4/blob/main/Presentation_Team4.pdf)
+
 # React + FastAPI App
 
 A web application built with React (Frontend) and FastAPI (Backend).
